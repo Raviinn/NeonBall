@@ -95,4 +95,5 @@ public class Enemy : MonoBehaviour
             animator.SetBool("is_walking", false);
         }
     }
+
 }
