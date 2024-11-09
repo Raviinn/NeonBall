@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public float movSpeed;
     float speedX, speedY;
     Rigidbody2D rb;
+    SpriteRenderer spriteRenderer;
     private GameObject cat;
     private GameObject player;
     private bool isFeeding;
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         player = rb.gameObject;
         isFeeding = false;
         isPetting = false;  
@@ -44,6 +46,15 @@ public class PlayerController : MonoBehaviour
         Vector2 movement = new Vector2(inputX, inputY).normalized * movSpeed;
 
         rb.velocity = movement;
+
+        if (inputX < 0)
+        {
+            spriteRenderer.flipX = false; 
+        }
+        else if (inputX > 0)
+        {
+            spriteRenderer.flipX = true;
+        }
     }
 
     public void SetLayerOrder()
