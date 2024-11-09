@@ -31,8 +31,8 @@ public class CatController : MonoBehaviour
         changeDirectionTimer = changeDirectionTime;
         isReadyForNextAction = true;
         rb = GetComponent<Rigidbody2D>();
-        cat = GameObject.Find("Cat");
-        catText = GameObject.Find("Canvas/CatRequestText").GetComponent<Text>();
+        cat = rb.gameObject;
+        catText = cat.transform.Find("CatRequest/Canvas/CatRequestText").GetComponent<Text>();
         catText.color = Color.green;
         countResponseTime = 0f;
         isPlayerCorrectResponse = false;
@@ -121,7 +121,7 @@ public class CatController : MonoBehaviour
     public void ChooseAction()
     {
         catText.text = null;
-        int randomAction = Random.Range(0, 10000);
+        int randomAction = Random.Range(0, 1000);
         if (randomAction < 3)
         {
             isReadyForNextAction = false;
@@ -132,8 +132,8 @@ public class CatController : MonoBehaviour
                     catAction = "Feed";
                     break;
                 case 1:
-                    Debug.Log("Play");
-                    catAction = "Play";
+                    Debug.Log("Give a Toy");
+                    catAction = "Give a Toy";
                     break;
                 case 2:
                     Debug.Log("Pet");
@@ -154,7 +154,6 @@ public class CatController : MonoBehaviour
 
     private void UpdateCatCaptionPos()//update caption pos on top of cat
     {
-        catText.transform.position = new Vector3(rb.position.x, rb.position.y + 2, 0);
         if (catAction != null) {
             Vector3 screenPos = Camera.main.WorldToScreenPoint(cat.transform.position);
             screenPos.y += 180;
@@ -169,11 +168,13 @@ public class CatController : MonoBehaviour
         if (isPlayerCorrectResponse)
         {
             ConfirmPlayerScore();
+            catAction = null;
             isReadyForNextAction = true;
             catText.color = Color.green;
             isPlayerCorrectResponse = false;
+            countResponseTime = 0;
         }
-        if (!isReadyForNextAction)
+        else if (!isReadyForNextAction)
         {
             countResponseTime += Time.deltaTime;
             if (countResponseTime >= 5f)
