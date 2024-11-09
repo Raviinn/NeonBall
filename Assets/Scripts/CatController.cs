@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Enemy : MonoBehaviour
+public class CatController : MonoBehaviour
 {
     public float movSpeed = 2.0f;            // Movement speed
     public float changeDirectionTime = 3.0f; // Time interval to change direction
@@ -18,21 +19,36 @@ public class Enemy : MonoBehaviour
     private bool isIdle;
     private float time = 0;
     private bool isReadyForNextAction;
+    public string catAction;
+    private Text catText;
+    private GameObject cat;
+    private float countResponseTime;
+    public bool isPlayerCorrectResponse;
+    private ScoreManager scoreManager;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
         changeDirectionTimer = changeDirectionTime;
         isReadyForNextAction = true;
+        rb = GetComponent<Rigidbody2D>();
+        cat = GameObject.Find("Cat");
+        catText = GameObject.Find("Canvas/CatRequestText").GetComponent<Text>();
+        catText.color = Color.green;
+        countResponseTime = 0f;
+        isPlayerCorrectResponse = false;
+        scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
     }
 
     void Update()
     {
         Move();
+        UpdateCatCaptionPos();
+        CheckResponseTime();
         if (isReadyForNextAction)
         {
-            ChooseAction();
+           ChooseAction();
         }
+
     }
 
     void PickRandomDirection()
@@ -58,11 +74,9 @@ public class Enemy : MonoBehaviour
 
     void Move()
     {
-        changeDirectionTimer -= Time.deltaTime;
-
         if (changeDirectionTimer <= 0)
         {
-            //Debug.Log("Changing Direction");
+            Debug.Log("Change Direction");
             PickRandomDirection();
             changeDirectionTimer = changeDirectionTime;
         }
@@ -101,11 +115,13 @@ public class Enemy : MonoBehaviour
             rb.velocity = Vector2.zero;
             //animator.SetBool("is_walking", false);
         }
+        changeDirectionTimer -= Time.deltaTime;
     }
 
     public void ChooseAction()
     {
-        int randomAction = Random.Range(0, 1000);
+        catText.text = null;
+        int randomAction = Random.Range(0, 10000);
         if (randomAction < 3)
         {
             isReadyForNextAction = false;
@@ -113,26 +129,81 @@ public class Enemy : MonoBehaviour
             {
                 case 0:
                     Debug.Log("Feed");
+                    catAction = "Feed";
                     break;
                 case 1:
                     Debug.Log("Play");
+                    catAction = "Play";
                     break;
                 case 2:
                     Debug.Log("Pet");
+                    catAction = "Pet";
                     break;
                 default:
                     break;
             }
             StartCoroutine(HoldAction());
-            Debug.Log("Done");
         }
     }
 
     private IEnumerator HoldAction()
     {
-        yield return new WaitForSeconds(10f);
-        isReadyForNextAction = true;
+        yield return new WaitForSeconds(3f);
         StopAllCoroutines();
     }
+
+    private void UpdateCatCaptionPos()//update caption pos on top of cat
+    {
+        catText.transform.position = new Vector3(rb.position.x, rb.position.y + 2, 0);
+        if (catAction != null) {
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(cat.transform.position);
+            screenPos.y += 180;
+            screenPos.x += 80;
+            catText.transform.position = screenPos;
+            catText.text = catAction;
+        }
+    }
+
+    private void CheckResponseTime()
+    {
+        if (isPlayerCorrectResponse)
+        {
+            ConfirmPlayerScore();
+            isReadyForNextAction = true;
+            catText.color = Color.green;
+            isPlayerCorrectResponse = false;
+        }
+        if (!isReadyForNextAction)
+        {
+            countResponseTime += Time.deltaTime;
+            if (countResponseTime >= 5f)
+            {
+                countResponseTime = 0;
+                if (catText.color == Color.green)
+                {
+                    catText.color = Color.white;
+                }else if (catText.color == Color.white)
+                {
+                    catText.color = Color.red;
+                }
+            }
+        }
+    }
+
+    private void ConfirmPlayerScore()
+    {
+        if (catText.color == Color.green)
+        {
+            scoreManager.AddBonusPlayerScore();
+        }else if (catText.color == Color.white)
+        {
+            scoreManager.AddPlayerScore();
+        }
+        else
+        {
+            scoreManager.MinusPlayerScore();
+        }
+    }
+
 
 }
