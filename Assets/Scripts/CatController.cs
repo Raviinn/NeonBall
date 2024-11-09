@@ -16,25 +16,23 @@ public class Enemy : MonoBehaviour
     private Vector2 movementDirection;
     private float changeDirectionTimer;
     private bool isIdle;
+    private float time = 0;
+    private bool isReadyForNextAction;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         changeDirectionTimer = changeDirectionTime;
+        isReadyForNextAction = true;
     }
 
     void Update()
     {
-        changeDirectionTimer -= Time.deltaTime;
-
-        if (changeDirectionTimer <= 0)
-        {
-            Debug.Log("Changing Direction");
-            PickRandomDirection();
-            changeDirectionTimer = changeDirectionTime;
-        }
-
         Move();
+        if (isReadyForNextAction)
+        {
+            ChooseAction();
+        }
     }
 
     void PickRandomDirection()
@@ -60,6 +58,15 @@ public class Enemy : MonoBehaviour
 
     void Move()
     {
+        changeDirectionTimer -= Time.deltaTime;
+
+        if (changeDirectionTimer <= 0)
+        {
+            //Debug.Log("Changing Direction");
+            PickRandomDirection();
+            changeDirectionTimer = changeDirectionTime;
+        }
+
         if (!isIdle)
         {
             // Move the enemy smoothly
@@ -69,22 +76,22 @@ public class Enemy : MonoBehaviour
             if (rb.velocity.magnitude < 0.01f)
             {
                 rb.velocity = Vector2.zero;
-                animator.SetBool("is_walking", false);
+                //animator.SetBool("is_walking", false);
             }
             else
             {
-                animator.SetBool("is_walking", true);
+                //animator.SetBool("is_walking", true);
 
                 // Flip the sprite based on the movement direction
                 if (rb.velocity.x > 0)
                 {
-                    mc.flipX = false;
-                    hair.flipX = false;
+                    //mc.flipX = false;
+                    //hair.flipX = false;
                 }
                 else if (rb.velocity.x < 0)
                 {
-                    mc.flipX = true;
-                    hair.flipX = true;
+                    //mc.flipX = true;
+                    //hair.flipX = true;
                 }
             }
         }
@@ -92,8 +99,40 @@ public class Enemy : MonoBehaviour
         {
             // Instantly set the velocity to zero and switch to idle animation
             rb.velocity = Vector2.zero;
-            animator.SetBool("is_walking", false);
+            //animator.SetBool("is_walking", false);
         }
+    }
+
+    public void ChooseAction()
+    {
+        int randomAction = Random.Range(0, 1000);
+        if (randomAction < 3)
+        {
+            isReadyForNextAction = false;
+            switch (randomAction)
+            {
+                case 0:
+                    Debug.Log("Feed");
+                    break;
+                case 1:
+                    Debug.Log("Play");
+                    break;
+                case 2:
+                    Debug.Log("Pet");
+                    break;
+                default:
+                    break;
+            }
+            StartCoroutine(HoldAction());
+            Debug.Log("Done");
+        }
+    }
+
+    private IEnumerator HoldAction()
+    {
+        yield return new WaitForSeconds(10f);
+        isReadyForNextAction = true;
+        StopAllCoroutines();
     }
 
 }
