@@ -39,6 +39,7 @@ public class CatController : MonoBehaviour
         countResponseTime = 0f;
         isPlayerCorrectResponse = false;
         scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -85,35 +86,30 @@ public class CatController : MonoBehaviour
 
         if (!isIdle)
         {
-            
-
             // Move the enemy smoothly
             rb.velocity = Vector2.Lerp(rb.velocity, movementDirection * movSpeed, Time.deltaTime * 1f);
-            Debug.Log(transform.position.y + " and " + transform.position.x);
-            if (transform.position.y <= (-3.2f) || transform.position.y >= 3.25f || transform.position.x <= (-8f) || transform.position.x >= 5.82f)
-            {
-                Debug.Log("Pasok");
-                rb.velocity = Vector2.zero;
-            }
+            
 
             // If the velocity is very close to zero, stop the movement and set to idle
             if (rb.velocity.magnitude < 0.01f)
             {
                 rb.velocity = Vector2.zero;
-                //animator.SetBool("is_walking", false);
+                animator.SetBool("isWalking", false);
             }
             else
             {
-                //animator.SetBool("is_walking", true);
+                animator.SetBool("isWalking", true);
 
                 // Flip the sprite based on the movement direction
                 if (rb.velocity.x > 0)
                 {
+                    cat.GetComponent<SpriteRenderer>().flipX = true;
                     //mc.flipX = false;
                     //hair.flipX = false;
                 }
                 else if (rb.velocity.x < 0)
                 {
+                    cat.GetComponent<SpriteRenderer>().flipX = false;
                     //mc.flipX = true;
                     //hair.flipX = true;
                 }
@@ -124,7 +120,7 @@ public class CatController : MonoBehaviour
         {
             // Instantly set the velocity to zero and switch to idle animation
             rb.velocity = Vector2.zero;
-            //animator.SetBool("is_walking", false);
+            animator.SetBool("isWalking", false);
         }
         changeDirectionTimer -= Time.deltaTime;
     }
@@ -167,8 +163,8 @@ public class CatController : MonoBehaviour
     {
         if (catAction != null) {
             Vector3 screenPos = Camera.main.WorldToScreenPoint(cat.transform.position);
-            screenPos.y += 180;
-            screenPos.x += 80;
+            screenPos.y += 110;
+            screenPos.x += 50;
             catText.transform.position = Vector2.Lerp(catText.transform.position, screenPos, Time.deltaTime * 20);
             catText.text = catAction;
         }
