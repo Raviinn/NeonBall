@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     float speedX, speedY;
     Rigidbody2D rb;
     SpriteRenderer spriteRenderer;
+    CircleCollider2D circleCollider;
     private GameObject cat;
     private GameObject player;
     private bool isFeeding;
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        circleCollider = GetComponent<CircleCollider2D>();
         player = rb.gameObject;
         isFeeding = false;
         isPetting = false;  
@@ -49,11 +51,13 @@ public class PlayerController : MonoBehaviour
 
         if (inputX < 0)
         {
-            spriteRenderer.flipX = false; 
+            spriteRenderer.flipX = false;
+            circleCollider.offset = new Vector2(-1.05f, circleCollider.offset.y);
         }
         else if (inputX > 0)
         {
             spriteRenderer.flipX = true;
+            circleCollider.offset = new Vector2(1.05f, circleCollider.offset.y);
         }
     }
 
