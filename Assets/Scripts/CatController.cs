@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static System.Net.Mime.MediaTypeNames;
 
 public class CatController : MonoBehaviour
 {
@@ -20,7 +22,7 @@ public class CatController : MonoBehaviour
     private float time = 0;
     private bool isReadyForNextAction;
     public string catAction;
-    private Text catText;
+    private UnityEngine.UI.Text catText;
     private GameObject cat;
     private float countResponseTime;
     public bool isPlayerCorrectResponse;
@@ -32,7 +34,7 @@ public class CatController : MonoBehaviour
         isReadyForNextAction = true;
         rb = GetComponent<Rigidbody2D>();
         cat = rb.gameObject;
-        catText = cat.transform.Find("CatRequest/Canvas/CatRequestText").GetComponent<Text>();
+        catText = cat.transform.Find("CatRequest/Canvas/CatRequestText").GetComponent<UnityEngine.UI.Text>();
         catText.color = Color.green;
         countResponseTime = 0f;
         isPlayerCorrectResponse = false;
@@ -66,7 +68,6 @@ public class CatController : MonoBehaviour
             // Randomize a larger distance and angle for the new position
             float randomAngle = Random.Range(0, 2 * Mathf.PI);
             float smallDistance = Random.Range(1f, 2f);  // Adjust these values for movement range
-
             // Calculate the new movement direction
             movementDirection = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle)).normalized * smallDistance;
         }
@@ -74,17 +75,26 @@ public class CatController : MonoBehaviour
 
     void Move()
     {
+        
         if (changeDirectionTimer <= 0)
         {
-            Debug.Log("Change Direction");
-            PickRandomDirection();
-            changeDirectionTimer = changeDirectionTime;
+                //Debug.Log("Change Direction");
+                PickRandomDirection();
+                changeDirectionTimer = changeDirectionTime;
         }
 
         if (!isIdle)
         {
+            
+
             // Move the enemy smoothly
-            rb.velocity = Vector2.Lerp(rb.velocity, movementDirection * movSpeed, Time.deltaTime * 2f);
+            rb.velocity = Vector2.Lerp(rb.velocity, movementDirection * movSpeed, Time.deltaTime * 1f);
+            Debug.Log(transform.position.y + " and " + transform.position.x);
+            if (transform.position.y <= (-3.2f) || transform.position.y >= 3.25f || transform.position.x <= (-8f) || transform.position.x >= 5.82f)
+            {
+                Debug.Log("Pasok");
+                rb.velocity = Vector2.zero;
+            }
 
             // If the velocity is very close to zero, stop the movement and set to idle
             if (rb.velocity.magnitude < 0.01f)
@@ -107,6 +117,7 @@ public class CatController : MonoBehaviour
                     //mc.flipX = true;
                     //hair.flipX = true;
                 }
+                
             }
         }
         else
@@ -158,7 +169,7 @@ public class CatController : MonoBehaviour
             Vector3 screenPos = Camera.main.WorldToScreenPoint(cat.transform.position);
             screenPos.y += 180;
             screenPos.x += 80;
-            catText.transform.position = screenPos;
+            catText.transform.position = Vector2.Lerp(catText.transform.position, screenPos, Time.deltaTime * 20);
             catText.text = catAction;
         }
     }

@@ -202,8 +202,8 @@ public class PlayerController : MonoBehaviour
         if (playerInsText.text != null)
         {
             Vector3 screenPos = Camera.main.WorldToScreenPoint(player.transform.position);
-            screenPos.y += 270;
-            screenPos.x += 40;
+            screenPos.y += 180;
+            screenPos.x += 30;
             playerInsText.transform.position = screenPos;
             playerInsText.text = action;
         }
